@@ -1,0 +1,9 @@
+bin/
+github.com/
+golang.org/
+gopkg.in/
+honnef.co/
+models/
+sqlboiler/
+*.rdb
+*.swp
