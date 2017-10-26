@@ -5,13 +5,14 @@ import (
 	"mv/utils"
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
-	"github.com/volatiletech/sqlboiler/queries/qm"
 	"mv/models"
 	"strconv"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
-func (im *ItemModule) FindItem(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
+func (im *ItemModule) LookupItem(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
 	request := ItemRequest{ItemRequested: Item{}, CookieString: ""}
 	out := utils.GetResponseObject()
 	defer out.Send(res)

@@ -49,6 +49,8 @@ func (im *ItemModule) Handler() http.Handler {
 
 	/*********** AUTH *************/
 	r.POST("/item/add_item", im.AddItem)
+	r.POST("/item/update_item", im.UpdateItem)
+	r.POST("/item/lookup_item", im.LookupItem)
 
 	/* ********* LAUNCH ************/
 	n.UseHandler(r)
