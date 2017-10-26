@@ -5,6 +5,7 @@ import (
 	"mv/models"
 	"mv/utils"
 	"net/http"
+	"strconv"
 
 	"github.com/gocql/gocql"
 	"github.com/julienschmidt/httprouter"
@@ -39,7 +40,7 @@ func (am *AuthModule) Login(res http.ResponseWriter, req *http.Request, p httpro
 	out.Response = map[string]interface{}{
 		"cookie": cookie,
 	}
-
 	am.RedisDB.TimedAdd("SessionCookie", request.Email, cookie)
+	am.RedisDB.TimedAdd("PersonId", request.Email, strconv.FormatInt(person.ID, 64))
 	return
 }

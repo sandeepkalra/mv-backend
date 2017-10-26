@@ -1,4 +1,3 @@
-
 package utils
 
 import (
@@ -9,7 +8,7 @@ import (
 
 type SRespJson struct {
 	Code     int         `json:"code"`
-	Msg string `json:"message"`
+	Msg      string      `json:"message"`
 	Response interface{} `json:"response"`
 }
 

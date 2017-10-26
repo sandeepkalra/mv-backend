@@ -1,19 +1,19 @@
-
 package utils
 
 import (
 	"crypto/sha256"
 	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"hash"
 	"strings"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 const (
 	DB_USER     = "root"
 	DB_PASSWORD = ""
-	DB_DBNAME   = "true_answer"
+	DB_DBNAME   = "mvdb"
 	DB_TYPE     = "mysql"
 )
 
