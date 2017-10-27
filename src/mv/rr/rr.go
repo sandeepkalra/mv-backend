@@ -18,6 +18,8 @@ type RR struct {
 	Pros                       string    `json:"pros"`
 	Cons                       string    `json:"cons"`
 	RelationshipDate           time.Time `json:"relationship_date"`
+	HasResponse                bool      `json:"has_response"`
+	IsResponse                 bool      `json:"is_response"`
 	HideDetails                bool      `json:"hide_details"`
 }
 
