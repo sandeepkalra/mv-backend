@@ -118,7 +118,6 @@ func (im *ItemModule) LookupItem(res http.ResponseWriter, req *http.Request, p h
 			CreatedOn:         i.CreatedOn.Time,
 			ExpiredOn:         i.ExpiryOn.Time,
 			IsExpired:         i.HasExpired.Valid,
-			HasResponseItem:   i.HasResponseItem.Valid,
 		}
 		item_slice_to_return = append(item_slice_to_return, item)
 	}
