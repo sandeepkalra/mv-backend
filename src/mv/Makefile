@@ -1,4 +1,4 @@
-titleRM=rm -rf
+RM=rm -rf
 FMT=go fmt 
 GET=go get 
 BUILD=go build
