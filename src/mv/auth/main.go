@@ -36,6 +36,10 @@ func (am *AuthModule) ServerClose() {
 }
 
 func (am *AuthModule) Middleware(res http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
+	/* CORS */
+	res.Header().Set("Content-Type", "text/html; charset=utf-8")
+	res.Header().Set("Access-Control-Allow-Origin", "*")
+
 	if strings.Contains(req.URL.Path, "/auth/") != true {
 
 	} else {

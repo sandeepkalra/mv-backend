@@ -17,6 +17,7 @@ func (am *AuthModule) Login(res http.ResponseWriter, req *http.Request, p httpro
 	out := utils.GetResponseObject()
 	defer out.Send(res)
 
+
 	if e := json.NewDecoder(req.Body).Decode(&request); e != nil {
 		out.Msg = " failed to decode incoming msg "
 		return
@@ -29,7 +30,7 @@ func (am *AuthModule) Login(res http.ResponseWriter, req *http.Request, p httpro
 	}
 
 	person, err := models.People(am.DataBase, qm.Where("email=? AND password=?", request.Email, request.Password)).One()
-	if err == nil && person == nil {
+	if err != nil || person == nil {
 		out.Msg = " entry does not  exist "
 		return
 	}
@@ -40,6 +41,7 @@ func (am *AuthModule) Login(res http.ResponseWriter, req *http.Request, p httpro
 	out.Response = map[string]interface{}{
 		"cookie": cookie,
 	}
+
 	am.RedisDB.TimedAdd("SessionCookie", request.Email, cookie)
 	am.RedisDB.TimedAdd("PersonId", request.Email, strconv.FormatInt(person.ID, 64))
 	return
