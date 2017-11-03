@@ -3,16 +3,18 @@ package main
 import (
 	"database/sql"
 	"mv/utils"
+	"time"
 )
 
 /* -------- Signup -------- */
 type SignupReq struct {
-	Email     string `json:"email"`
-	FName     string `json:"first_name"`
-	LName     string `json:"last_name"`
-	Password  string `json:"password"`
-	DigitLock int    `json:"four_digit_lock"`
-	IsBlocked bool   `json:"is_blocked"`
+	Email     string    `json:"email"`
+	FName     string    `json:"first_name"`
+	LName     string    `json:"last_name"`
+	DOB       time.Time `json:"date_of_birth"`
+	Password  string    `json:"password"`
+	DigitLock int       `json:"four_digit_lock"`
+	IsBlocked bool      `json:"is_blocked"`
 }
 
 type SignupResp struct {

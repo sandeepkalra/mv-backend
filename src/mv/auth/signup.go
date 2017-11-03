@@ -6,10 +6,12 @@ import (
 	"mv/utils"
 	"net/http"
 
+	"fmt"
 	"github.com/gocql/gocql"
 	"github.com/julienschmidt/httprouter"
 	"github.com/volatiletech/sqlboiler/queries/qm"
 	"gopkg.in/volatiletech/null.v6"
+	"time"
 )
 
 func (am *AuthModule) Signup(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
@@ -18,7 +20,8 @@ func (am *AuthModule) Signup(res http.ResponseWriter, req *http.Request, p httpr
 	defer out.Send(res)
 
 	if e := json.NewDecoder(req.Body).Decode(&request); e != nil {
-		out.Msg = " failed to decode incoming msg "
+		out.Msg = "signup: failed to decode incoming msg " + e.Error()
+		out.Response = e.Error()
 		return
 	}
 
@@ -37,13 +40,18 @@ func (am *AuthModule) Signup(res http.ResponseWriter, req *http.Request, p httpr
 		return
 	}
 
+	encrpted_password := utils.GetCryptPassword(request.Password)
+	fmt.Println("encrypted password ", encrpted_password)
 	// CREATE NEW ENTRY
 	person := models.Person{
 		Email:        null.StringFrom(request.Email),
 		FName:        null.StringFrom(request.FName),
 		LName:        null.StringFrom(request.LName),
 		DigitLock:    null.IntFrom(request.DigitLock),
+		Password:     null.StringFrom(encrpted_password),
+		CreatedOn:    null.TimeFrom(time.Now()),
 		OneTimeToken: null.StringFrom(gocql.TimeUUID().String()),
+		IsBlocked:    null.Int8From(1),
 	}
 
 	if err := person.Insert(am.DataBase); err != nil {

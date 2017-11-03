@@ -18,7 +18,7 @@ import (
 )
 
 func InitServer() (*AuthModule, error) {
-	db, err := sql.Open("mysql", "root:@/mvdb")
+	db, err := sql.Open("mysql", "root:@/mvdb?parseTime=true")
 	if err != nil {
 		return nil, err
 	}
@@ -27,6 +27,7 @@ func InitServer() (*AuthModule, error) {
 		db.Close()
 		return nil, fmt.Errorf("failed to init redis")
 	}
+
 	return &AuthModule{DataBase: db, RedisDB: redis}, nil
 }
 

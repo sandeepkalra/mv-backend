@@ -13,7 +13,7 @@ import (
 )
 
 func InitServer() (*ItemModule, error) {
-	db, err := sql.Open("mysql", "root:@/mvdb")
+	db, err := sql.Open("mysql", "root:@/mvdb?parseTime=true")
 	if err != nil {
 		return nil, err
 	}

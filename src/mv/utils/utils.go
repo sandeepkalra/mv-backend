@@ -1,13 +1,14 @@
 package utils
 
 import (
-	"crypto/sha256"
 	"database/sql"
 	"fmt"
-	"hash"
 	"strings"
 
+
+	"golang.org/x/crypto/bcrypt"
 	_ "github.com/go-sql-driver/mysql"
+	"log"
 )
 
 const (
@@ -32,15 +33,13 @@ func IsPhone(email_or_ph string) bool {
 	return isPh
 }
 
-func GetCryptPassword(h hash.Hash, password string) string {
-	h.Reset()
-	h.Write([]byte(password))
-	s := string(h.Sum(nil))
-	return s
-}
-
-func InitCrypt256() hash.Hash {
-	return sha256.New()
+func GetCryptPassword(password string) string {
+	pasBytes, e := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if e != nil {
+		// TODO: Properly handle error
+		log.Fatal(e)
+	}
+	return string(pasBytes)
 }
 
 func InitDB() (*sql.DB, error) {

@@ -17,7 +17,6 @@ func (am *AuthModule) Login(res http.ResponseWriter, req *http.Request, p httpro
 	out := utils.GetResponseObject()
 	defer out.Send(res)
 
-
 	if e := json.NewDecoder(req.Body).Decode(&request); e != nil {
 		out.Msg = " failed to decode incoming msg "
 		return

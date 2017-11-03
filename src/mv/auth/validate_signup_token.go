@@ -6,6 +6,7 @@ import (
 	"mv/utils"
 	"net/http"
 
+	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"github.com/volatiletech/sqlboiler/queries/qm"
 	"gopkg.in/volatiletech/null.v6"
@@ -28,13 +29,16 @@ func (am *AuthModule) ValidateSignupToken(res http.ResponseWriter, req *http.Req
 	}
 
 	person, err := models.People(am.DataBase, qm.Where("email=? AND one_time_token=?", request.Email, request.Token)).One()
-	if err == nil && person == nil {
-		out.Msg = " entry does not  exist "
+	if err != nil || person == nil {
+		out.Msg = " entry does not  exist " + err.Error()
+		fmt.Println(err.Error())
 		return
 	}
 
 	person.IsBlocked = null.Int8From(0)
 	person.OneTimeToken = null.StringFrom("")
+
+	fmt.Println("reset ing blocked->unblocked, one-time token to null")
 
 	if err := person.Update(am.DataBase); err != nil {
 		out.Msg = err.Error()
