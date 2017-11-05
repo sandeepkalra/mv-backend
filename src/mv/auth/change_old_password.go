@@ -12,7 +12,7 @@ import (
 )
 
 func (am *AuthModule) ChangeOldPassword(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
-	request := ChangeOldPasswordReq{Email: "", DigitLock: 0, OldPassword: "", NewPassword: ""}
+	request := ChangeOldPasswordReq{Email: "", OldPassword: "", NewPassword: ""}
 	out := utils.GetResponseObject()
 	defer out.Send(res)
 
@@ -23,24 +23,28 @@ func (am *AuthModule) ChangeOldPassword(res http.ResponseWriter, req *http.Reque
 
 	if len(request.Email) == 0 ||
 		len(request.OldPassword) == 0 ||
-		len(request.NewPassword) == 0 ||
-		request.DigitLock == 0 {
+		len(request.NewPassword) == 0 {
 		out.Msg = " Empty fields not allowed "
 		return
 	}
 
-	person, err := models.People(am.DataBase, qm.Where("email=? AND password=? AND digit_lock = ?", request.Email, request.OldPassword, request.DigitLock)).One()
-	if err == nil && person == nil {
+	person, err := models.People(am.DataBase, qm.Where("email=?", request.Email)).One()
+	if err != nil || person == nil {
 		out.Msg = " entry credential failed  "
 		return
 	}
 
-	if *(person.IsBlocked.Ptr()) == 1 {
+	if person.IsBlocked.Int8 == 1 {
 		out.Msg = " Signup is still incomplete "
 		return
 	}
 
-	person.Password = null.StringFrom(request.NewPassword)
+	if b, e := utils.CheckPasswordHashes(request.OldPassword, person.Password.String); b != true {
+		out.Msg = " old  password , digit do not match ; " + e.Error()
+		return
+	}
+
+	person.Password = null.StringFrom(utils.GetCryptPassword(request.NewPassword))
 
 	if err := person.Update(am.DataBase); err != nil {
 		out.Msg = err.Error()

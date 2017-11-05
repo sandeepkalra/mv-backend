@@ -15,7 +15,7 @@ import (
 )
 
 func (am *AuthModule) Signup(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
-	request := SignupReq{Email: "", Password: "", DigitLock: 0, FName: "", LName: "", IsBlocked: true}
+	request := SignupReq{Email: "", Password: "", DigitLock: "", FName: "", LName: "", IsBlocked: true}
 	out := utils.GetResponseObject()
 	defer out.Send(res)
 
@@ -29,7 +29,7 @@ func (am *AuthModule) Signup(res http.ResponseWriter, req *http.Request, p httpr
 		len(request.Password) == 0 ||
 		len(request.LName) == 0 ||
 		len(request.FName) == 0 ||
-		request.DigitLock == 0 {
+		len(request.DigitLock) == 0 {
 		out.Msg = " Empty fields not allowed "
 		return
 	}
@@ -41,13 +41,14 @@ func (am *AuthModule) Signup(res http.ResponseWriter, req *http.Request, p httpr
 	}
 
 	encrpted_password := utils.GetCryptPassword(request.Password)
+	encrupted_digit_lock := utils.GetCryptPassword(request.DigitLock)
 	fmt.Println("encrypted password ", encrpted_password)
 	// CREATE NEW ENTRY
 	person := models.Person{
 		Email:        null.StringFrom(request.Email),
 		FName:        null.StringFrom(request.FName),
 		LName:        null.StringFrom(request.LName),
-		DigitLock:    null.IntFrom(request.DigitLock),
+		DigitLock:    null.StringFrom(encrupted_digit_lock),
 		Password:     null.StringFrom(encrpted_password),
 		CreatedOn:    null.TimeFrom(time.Now()),
 		OneTimeToken: null.StringFrom(gocql.TimeUUID().String()),

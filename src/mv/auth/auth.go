@@ -13,7 +13,7 @@ type SignupReq struct {
 	LName     string    `json:"last_name"`
 	DOB       time.Time `json:"date_of_birth"`
 	Password  string    `json:"password"`
-	DigitLock int       `json:"four_digit_lock"`
+	DigitLock string    `json:"four_digit_lock"`
 	IsBlocked bool      `json:"is_blocked"`
 }
 
@@ -66,7 +66,6 @@ type ForgotDigitLockResp struct {
 /* -------- ChangeOldPassword -------- */
 type ChangeOldPasswordReq struct {
 	Email       string `json:"email"`
-	DigitLock   int    `json:"four_digit_lock"`
 	OldPassword string `json:"old_password"`
 	NewPassword string `json:"new_password"`
 }
@@ -77,12 +76,29 @@ type ChangeOldPasswordResp struct {
 /* -------- ChangeOldDigitLock -------- */
 type ChangeOldDigitLockReq struct {
 	Email        string `json:"email"`
-	Password     string `json:"password"`
-	OldDigitLock int    `json:"old_four_digit_lock"`
-	NewDigitLock int    `json:"new_four_digit_lock"`
+	OldDigitLock string `json:"old_four_digit_lock"`
+	NewDigitLock string `json:"new_four_digit_lock"`
 }
 
 type ChangeOldDigitLockResp struct {
+}
+
+/* -------- ResetDigitLock -------- */
+type ResetDigitLockReq struct {
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+	NewDigitLock string `json:"new_digit_lock"`
+}
+type ResetDigitLockResp struct {
+}
+
+/* -------- ResetPassword -------- */
+type ResetPasswordReq struct {
+	Email       string `json:"email"`
+	DigitLock   string `json:"digit_lock"`
+	NewPassword string `json:"new_password"`
+}
+type ResetPasswordResp struct {
 }
 
 type AuthModule struct {

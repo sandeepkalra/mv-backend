@@ -11,8 +11,8 @@ import (
 	"gopkg.in/volatiletech/null.v6"
 )
 
-func (am *AuthModule) ChangeOldDigitLock(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
-	request := ChangeOldDigitLockReq{Email: "", OldDigitLock: "", NewDigitLock: ""}
+func (am *AuthModule) ResetPassword(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
+	request := ResetPasswordReq{Email: "", DigitLock: "", NewPassword: ""}
 	out := utils.GetResponseObject()
 	defer out.Send(res)
 
@@ -22,8 +22,8 @@ func (am *AuthModule) ChangeOldDigitLock(res http.ResponseWriter, req *http.Requ
 	}
 
 	if len(request.Email) == 0 ||
-		len(request.OldDigitLock) == 0 ||
-		len(request.NewDigitLock) == 0 {
+		len(request.NewPassword) == 0 ||
+		len(request.DigitLock) == 0 {
 		out.Msg = " Empty fields not allowed "
 		return
 	}
@@ -39,12 +39,12 @@ func (am *AuthModule) ChangeOldDigitLock(res http.ResponseWriter, req *http.Requ
 		return
 	}
 
-	if b, e := utils.CheckPasswordHashes(request.OldDigitLock, person.DigitLock.String); b != true {
+	if b, e := utils.CheckPasswordHashes(request.DigitLock, person.DigitLock.String); b != true {
 		out.Msg = " digit, password do not match ; " + e.Error()
 		return
 	}
 
-	person.DigitLock = null.StringFrom(utils.GetCryptPassword(request.NewDigitLock))
+	person.Password = null.StringFrom(utils.GetCryptPassword(request.NewPassword))
 
 	if err := person.Update(am.DataBase); err != nil {
 		out.Msg = err.Error()

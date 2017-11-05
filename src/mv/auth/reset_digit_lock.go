@@ -11,8 +11,8 @@ import (
 	"gopkg.in/volatiletech/null.v6"
 )
 
-func (am *AuthModule) ChangeOldDigitLock(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
-	request := ChangeOldDigitLockReq{Email: "", OldDigitLock: "", NewDigitLock: ""}
+func (am *AuthModule) ResetDigitLock(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
+	request := ResetDigitLockReq{Email: "", Password: "", NewDigitLock: ""}
 	out := utils.GetResponseObject()
 	defer out.Send(res)
 
@@ -22,8 +22,8 @@ func (am *AuthModule) ChangeOldDigitLock(res http.ResponseWriter, req *http.Requ
 	}
 
 	if len(request.Email) == 0 ||
-		len(request.OldDigitLock) == 0 ||
-		len(request.NewDigitLock) == 0 {
+		len(request.NewDigitLock) == 0 ||
+		len(request.Password) == 0 {
 		out.Msg = " Empty fields not allowed "
 		return
 	}
@@ -38,9 +38,8 @@ func (am *AuthModule) ChangeOldDigitLock(res http.ResponseWriter, req *http.Requ
 		out.Msg = " Signup is still incomplete "
 		return
 	}
-
-	if b, e := utils.CheckPasswordHashes(request.OldDigitLock, person.DigitLock.String); b != true {
-		out.Msg = " digit, password do not match ; " + e.Error()
+	if b, e := utils.CheckPasswordHashes(request.Password, person.Password.String); b != true {
+		out.Msg = " Password , digits do not match ;" + e.Error()
 		return
 	}
 

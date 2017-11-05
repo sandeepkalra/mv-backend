@@ -36,10 +36,17 @@ func IsPhone(email_or_ph string) bool {
 func GetCryptPassword(password string) string {
 	pasBytes, e := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if e != nil {
-		// TODO: Properly handle error
+		 //TODO: Properly handle error
 		log.Fatal(e)
 	}
 	return string(pasBytes)
+}
+
+func CheckPasswordHashes(request_password, db_password string) (bool, error) {
+	if e:= bcrypt.CompareHashAndPassword([]byte(db_password),[]byte(request_password)) ; e != nil {
+		return false, e
+	}
+	return true, nil
 }
 
 func InitDB() (*sql.DB, error) {
