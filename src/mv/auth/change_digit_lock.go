@@ -47,7 +47,7 @@ func (am *AuthModule) ChangeOldDigitLock(res http.ResponseWriter, req *http.Requ
 	person.DigitLock = null.StringFrom(utils.GetCryptPassword(request.NewDigitLock))
 
 	if err := person.Update(am.DataBase); err != nil {
-		out.Msg = err.Error()
+		out.Msg = "failed" + err.Error()
 		return
 	}
 

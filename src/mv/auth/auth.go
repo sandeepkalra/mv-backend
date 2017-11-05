@@ -76,8 +76,8 @@ type ChangeOldPasswordResp struct {
 /* -------- ChangeOldDigitLock -------- */
 type ChangeOldDigitLockReq struct {
 	Email        string `json:"email"`
-	OldDigitLock string `json:"old_four_digit_lock"`
-	NewDigitLock string `json:"new_four_digit_lock"`
+	OldDigitLock string `json:"old_digit_lock"`
+	NewDigitLock string `json:"new_digit_lock"`
 }
 
 type ChangeOldDigitLockResp struct {

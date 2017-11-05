@@ -62,7 +62,7 @@ func (am *AuthModule) Handler() http.Handler {
 	r.POST("/auth/signup", am.Signup)
 	r.POST("/auth/validate_token", am.ValidateSignupToken)
 	r.POST("/auth/change_old_password", am.ChangeOldPassword)
-	r.POST("/auth/change_old_fourdigitlock", am.ChangeOldDigitLock)
+	r.POST("/auth/change_old_digit_lock", am.ChangeOldDigitLock)
 	r.POST("/auth/reset_password", am.ResetPassword)
 	r.POST("/auth/reset_digit_lock", am.ResetDigitLock)
 	r.POST("/auth/login", am.Login)
