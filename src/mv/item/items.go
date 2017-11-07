@@ -33,6 +33,16 @@ type ItemRequest struct {
 	CookieString  string `json:"cookie"`
 }
 
+type GetListRequest struct {
+	NeedManufacturerList bool   `json:"need_manufacturer_list"`
+	ManufacturerContains string `json:"manufacturer_name_contains"`
+
+	NeedCategoryList     bool   `json:"need_category_list"`
+	CategoryNameContains string `json:"category_name_contains"`
+
+	CookieString  string `json:"cookie"`
+}
+
 type ItemModule struct {
 	DataBase *sql.DB
 	RedisDB  *utils.RedisDb

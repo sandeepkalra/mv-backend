@@ -63,7 +63,6 @@ func (im *ItemModule) AddItem(res http.ResponseWriter, req *http.Request, p http
 	}
 
 	/* Else, we are here to add this item that user has requested */
-
 	item := models.Item{
 		ID:                request.ItemRequested.ID,
 		Name:              null.StringFrom(request.ItemRequested.Name),
@@ -92,6 +91,55 @@ func (im *ItemModule) AddItem(res http.ResponseWriter, req *http.Request, p http
 	if e := item.Insert(im.DataBase); e != nil {
 		out.Msg = e.Error()
 		return
+	}
+
+	/* At this point, we lookup manufacturer_list, and categories, and if they need to have this, we add there too */
+
+	if _manufacturer, err := models.ManufacturersLists(im.DataBase, qm.Where("name=?", request.ItemRequested.Manufacturer)).One(); err != nil {
+		_manufacturer.Name = null.StringFrom(request.ItemRequested.Manufacturer)
+		_manufacturer.Insert(im)
+	}
+
+	var _category_0_id, _category_1_id, _category_2_id int64
+
+	/* Category, level-0 */
+	if _category, err := models.Categories(im.DataBase, qm.Where("name=? AND fk_parent_category_id=?", request.ItemRequested.Category, 0)).One(); err != nil {
+		/* fk_parent_category_id = 0 , i.e. no parent of this category */
+		_category.Name = null.StringFrom(request.ItemRequested.Category)
+		_category.FKParentCategoryID = null.Int64From(0);
+		_category.Insert(im)
+		_category_0_id = _category.ID
+	} else {
+		_category_0_id = _category.ID
+	}
+
+	/* Category, level - 1 */
+	if _category, err := models.Categories(im.DataBase, qm.Where("name=? AND fk_parent_category_id=?", request.ItemRequested.Category, _category_0_id)).One(); err != nil {
+		/* fk_parent_category_id = 0 , i.e. no parent of this category */
+		_category.Name = null.StringFrom(request.ItemRequested.Category)
+		_category.FKParentCategoryID = null.Int64From(_category_0_id);
+		_category.Insert(im)
+		_category_1_id = _category.ID
+	} else {
+		_category_1_id = _category.ID
+	}
+	/* Category, level - 2 */
+	if _category, err := models.Categories(im.DataBase, qm.Where("name=? AND fk_parent_category_id=?", request.ItemRequested.Category, _category_1_id, _category_2_id)).One(); err != nil {
+		/* fk_parent_category_id = 0 , i.e. no parent of this category */
+		_category.Name = null.StringFrom(request.ItemRequested.Category)
+		_category.FKParentCategoryID = null.Int64From(_category_1_id);
+		_category.Insert(im)
+		_category_2_id = _category.ID
+	} else {
+		_category_2_id = _category.ID
+	}
+
+	/* Category, level - 3 */
+	if _category, err := models.Categories(im.DataBase, qm.Where("name=? AND fk_parent_category_id=?", request.ItemRequested.Category)).One(); err != nil {
+		/* fk_parent_category_id = 0 , i.e. no parent of this category */
+		_category.Name = null.StringFrom(request.ItemRequested.Category)
+		_category.FKParentCategoryID = null.Int64From(_category_2_id);
+		_category.Insert(im)
 	}
 
 	/* Done , Add success */
