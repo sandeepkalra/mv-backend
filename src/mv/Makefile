@@ -1,5 +1,6 @@
 RM=rm -rf
 FMT=go fmt 
+LINT=golint
 GET=go get 
 BUILD=go build
 VET=go vet 
@@ -10,14 +11,20 @@ RELEASE_FLAGS=-ldflags "-w"
 
 .PHONY : all 
 all: release
-release: setup format build_release release-install
-debug: setup format build_debug debug-install
-dock_all: setup format build_release release-install post_install
+release: setup format lint build_release release-install
+debug: setup format lint build_debug debug-install
+dock_all: setup format lint  build_release release-install post_install
 
 setup:
+	rm -rf bin
+	mkdir -p bin
 
+lint:
+	$(LINT) mv/auth
+	$(LINT) mv/rr
+	$(LINT) mv/item
 
-go_install: 
+go_install:
 	$(INST) mv/auth
 	$(INST) mv/rr
 	$(INST) mv/item

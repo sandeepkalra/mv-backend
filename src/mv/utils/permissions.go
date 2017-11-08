@@ -5,12 +5,13 @@ import (
 	"strconv"
 )
 
-func IsAllowed(req *http.Request) (email, user_type string, u_id int64, allowed bool) {
-	email = req.Header.Get(AUTH_USER_EMAIL)
-	user_type = req.Header.Get(AUTH_USER_TYPE)
-	usrIdStr := req.Header.Get(AUTH_USER_USERID)
-	u_id, _ = strconv.ParseInt(usrIdStr, 10, 64)
-	isUserBlocked := (req.Header.Get(AUTH_USER_BLOCKED) != "0")
+// IsAllowed is part of middleware to http router.
+func IsAllowed(req *http.Request) (email, userType string, uID int64, allowed bool) {
+	email = req.Header.Get(AuthUserEmail)
+	userType = req.Header.Get(AuthUserType)
+	usrIDStr := req.Header.Get(AuthUserID)
+	uID, _ = strconv.ParseInt(usrIDStr, 10, 64)
+	isUserBlocked := (req.Header.Get(AuthIsUserBlocked) != "0")
 	allowed = (isUserBlocked == false)
 	return
 }

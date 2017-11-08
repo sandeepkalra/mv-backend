@@ -17,6 +17,7 @@ import (
 	_ "gopkg.in/volatiletech/null.v6"
 )
 
+// InitServer intialize auth module
 func InitServer() (*AuthModule, error) {
 	db, err := sql.Open("mysql", "root:@/mvdb?parseTime=true")
 	if err != nil {
@@ -31,11 +32,13 @@ func InitServer() (*AuthModule, error) {
 	return &AuthModule{DataBase: db, RedisDB: redis}, nil
 }
 
+// ServerClose closes the handles of the server, handle destroy of objects.
 func (am *AuthModule) ServerClose() {
 	am.DataBase.Close()
 	am.RedisDB.R.Close()
 }
 
+// Middleware is middle-ware of the http router.
 func (am *AuthModule) Middleware(res http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	/* CORS */
 	res.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -50,6 +53,7 @@ func (am *AuthModule) Middleware(res http.ResponseWriter, req *http.Request, nex
 	return
 }
 
+// Handler is the main handler of the http router.
 func (am *AuthModule) Handler() http.Handler {
 
 	n := negroni.Classic()
@@ -73,6 +77,7 @@ func (am *AuthModule) Handler() http.Handler {
 	return n
 }
 
+// main Auth control starts here.
 func main() {
 	srv, e := InitServer()
 	if e != nil {
@@ -82,9 +87,9 @@ func main() {
 	defer srv.ServerClose()
 
 	/************* PREPARE TO LAUNCH *************/
-	listen_str := "0.0.0.0:9501"
-	fmt.Println("AUTH MICROSERVICES LISTENING AT AT ", listen_str)
+	listenStr := "0.0.0.0:9501"
+	fmt.Println("AUTH MICROSERVICES LISTENING AT AT ", listenStr)
 
 	/************* SET THE BALL ROLLING  *************/
-	http.ListenAndServe(listen_str, srv.Handler())
+	http.ListenAndServe(listenStr, srv.Handler())
 }

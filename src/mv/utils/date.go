@@ -1,11 +1,11 @@
 package utils
 
-// https://stackoverflow.com/questions/36530251/golang-time-since-with-months-and-years
-
 import (
 	"time"
 )
 
+// Diff finds difference in dates
+// ref   https://stackoverflow.com/questions/36530251/golang-time-since-with-months-and-years
 func Diff(a, b time.Time) (year, month, day, hour, min, sec int) {
 	if a.Location() != b.Location() {
 		b = b.In(a.Location())

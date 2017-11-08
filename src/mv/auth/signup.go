@@ -14,6 +14,7 @@ import (
 	"time"
 )
 
+// Signup signup a new user
 func (am *AuthModule) Signup(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
 	request := SignupReq{Email: "", Password: "", DigitLock: "", FName: "", LName: "", IsBlocked: true}
 	out := utils.GetResponseObject()
@@ -40,16 +41,16 @@ func (am *AuthModule) Signup(res http.ResponseWriter, req *http.Request, p httpr
 		return
 	}
 
-	encrpted_password := utils.GetCryptPassword(request.Password)
-	encrupted_digit_lock := utils.GetCryptPassword(request.DigitLock)
-	fmt.Println("encrypted password ", encrpted_password)
+	encrptedPassword := utils.GetCryptPassword(request.Password)
+	encruptedDigitLock := utils.GetCryptPassword(request.DigitLock)
+	fmt.Println("encrypted password ", encrptedPassword)
 	// CREATE NEW ENTRY
 	person := models.Person{
 		Email:        null.StringFrom(request.Email),
 		FName:        null.StringFrom(request.FName),
 		LName:        null.StringFrom(request.LName),
-		DigitLock:    null.StringFrom(encrupted_digit_lock),
-		Password:     null.StringFrom(encrpted_password),
+		DigitLock:    null.StringFrom(encruptedDigitLock),
+		Password:     null.StringFrom(encrptedPassword),
 		CreatedOn:    null.TimeFrom(time.Now()),
 		OneTimeToken: null.StringFrom(gocql.TimeUUID().String()),
 		IsBlocked:    null.Int8From(1),

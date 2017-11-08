@@ -9,9 +9,10 @@ import (
 	"os/signal"
 )
 
-func Consumer(topic, mq_ip, redis_ip string) (sarama.Consumer, *RedisDb, error) {
-	dial := mq_ip + ":9092"
-	redis_start_index_tag := topic + "_MsgStartIndex"
+// Consumer is a kafka consumer
+func Consumer(topic, myIP, redisIP string) (sarama.Consumer, *RedisDb, error) {
+	dial := myIP + ":9092"
+	redisStartIndexTag := topic + "_MsgStartIndex"
 
 	config := sarama.NewConfig()
 	config.Consumer.Return.Errors = true
@@ -23,18 +24,18 @@ func Consumer(topic, mq_ip, redis_ip string) (sarama.Consumer, *RedisDb, error) 
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to create consumer")
 	}
-	b, r := FastMemInit(redis_ip)
+	b, r := FastMemInit(redisIP)
 	if b != true {
 		master.Close()
 		return nil, nil, fmt.Errorf("Error connecting to Redis")
 	}
 
-	var start_offset_iter64 int64 = sarama.OffsetOldest
-	if r.R.Get(redis_start_index_tag).Val() != "" {
-		start_offset_iter64, _ = r.R.Get(redis_start_index_tag).Int64()
+	startOffsetIter64Bit := sarama.OffsetOldest
+	if r.R.Get(redisStartIndexTag).Val() != "" {
+		startOffsetIter64Bit, _ = r.R.Get(redisStartIndexTag).Int64()
 	}
 	// How to decide partition, is it fixed value...?
-	consumer, err := master.ConsumePartition(topic, 0, start_offset_iter64)
+	consumer, err := master.ConsumePartition(topic, 0, startOffsetIter64Bit)
 	if err != nil {
 		panic(err)
 	}
@@ -51,8 +52,8 @@ func Consumer(topic, mq_ip, redis_ip string) (sarama.Consumer, *RedisDb, error) 
 			case msg := <-consumer.Messages():
 				fmt.Println("Received messages", string(msg.Key), string(msg.Value))
 				//SendEmail(mySql, &cfg, msg)
-				start_offset_iter64++
-				r.R.Set(redis_start_index_tag, start_offset_iter64, 0)
+				startOffsetIter64Bit++
+				r.R.Set(redisStartIndexTag, startOffsetIter64Bit, 0)
 			case <-signals:
 				fmt.Println("Interrupt is detected")
 				doneCh <- struct{}{}

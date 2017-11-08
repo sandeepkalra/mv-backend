@@ -12,6 +12,7 @@ import (
 	"gopkg.in/volatiletech/null.v6"
 )
 
+// ValidateSignupToken validate the signup one time token, thus completing the signup process.
 func (am *AuthModule) ValidateSignupToken(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
 	request := ValidateSingupReq{Email: "", Token: ""}
 	out := utils.GetResponseObject()

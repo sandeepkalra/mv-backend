@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+// InitServer intialize RR module
 func InitServer() (*RRModule, error) {
 	db, err := sql.Open("mysql", "root:@/mvdb?parseTime=true")
 	if err != nil {
@@ -25,11 +26,13 @@ func InitServer() (*RRModule, error) {
 	return &RRModule{DataBase: db, RedisDB: redis}, nil
 }
 
+// ServerClose destroys RR module
 func (rr *RRModule) ServerClose() {
 	rr.DataBase.Close()
 	rr.RedisDB.R.Close()
 }
 
+// Middleware middle-ware to http router.
 func (rr *RRModule) Middleware(res http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	/* CORS */
 	res.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -44,6 +47,7 @@ func (rr *RRModule) Middleware(res http.ResponseWriter, req *http.Request, next 
 	return
 }
 
+// Handler handles http request, http router main handler
 func (rr *RRModule) Handler() http.Handler {
 
 	n := negroni.Classic()
@@ -59,6 +63,7 @@ func (rr *RRModule) Handler() http.Handler {
 	return n
 }
 
+// main - main RR control starting point.
 func main() {
 	srv, e := InitServer()
 	if e != nil {
@@ -68,9 +73,9 @@ func main() {
 	defer srv.ServerClose()
 
 	/************* PREPARE TO LAUNCH *************/
-	listen_str := "0.0.0.0:9503"
-	fmt.Println("RR MICROSERVICES LISTENING AT AT ", listen_str)
+	listenStr := "0.0.0.0:9503"
+	fmt.Println("RR MICROSERVICES LISTENING AT AT ", listenStr)
 
 	/************* SET THE BALL ROLLING  *************/
-	http.ListenAndServe(listen_str, srv.Handler())
+	http.ListenAndServe(listenStr, srv.Handler())
 }

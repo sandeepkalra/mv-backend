@@ -11,6 +11,7 @@ import (
 	"gopkg.in/volatiletech/null.v6"
 )
 
+//ChangeOldDigitLock changes old digit_lock with new.
 func (am *AuthModule) ChangeOldDigitLock(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
 	request := ChangeOldDigitLockReq{Email: "", OldDigitLock: "", NewDigitLock: ""}
 	out := utils.GetResponseObject()

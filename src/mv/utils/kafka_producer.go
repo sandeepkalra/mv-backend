@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+
 	"github.com/Shopify/sarama"
 
 	"encoding/json"
@@ -9,8 +10,9 @@ import (
 	"time"
 )
 
-func CreateKafkaProducer(kafka_ip string) (sarama.AsyncProducer, error) {
-	dial := kafka_ip + ":9092"
+// CreateKafkaProducer creates producer
+func CreateKafkaProducer(kafkaIP string) (sarama.AsyncProducer, error) {
+	dial := kafkaIP + ":9092"
 	config := sarama.NewConfig()
 	brokers := []string{dial}
 
@@ -23,6 +25,7 @@ func CreateKafkaProducer(kafka_ip string) (sarama.AsyncProducer, error) {
 	return producer, nil
 }
 
+//SendToKafkaQueue sends to kafka
 func SendToKafkaQueue(producer sarama.AsyncProducer, topic string, event interface{}) error {
 	data, err := json.Marshal(event)
 	if err != nil {

@@ -5,25 +5,26 @@ import (
 	"fmt"
 	"strings"
 
+	"log"
 
 	"golang.org/x/crypto/bcrypt"
-	_ "github.com/go-sql-driver/mysql"
-	"log"
 )
 
+// enums for the DB connection
 const (
-	DB_USER     = "root"
-	DB_PASSWORD = ""
-	DB_DBNAME   = "mvdb"
-	DB_TYPE     = "mysql"
+	DBUser       = "root"
+	DBPassword   = ""
+	DBSchemaName = "mvdb"
+	DBType       = "mysql"
 )
 
-func IsPhone(email_or_ph string) bool {
-	email_or_ph = strings.Replace(email_or_ph, " ", "", -1)
-	fmt.Println(email_or_ph)
+// IsPhone is to find if this is phone number or email.
+func IsPhone(emailOrPhone string) bool {
+	emailOrPhone = strings.Replace(emailOrPhone, " ", "", -1)
+	fmt.Println(emailOrPhone)
 	isPh := true
-	for i := 0; i < len(email_or_ph); i++ {
-		if email_or_ph[i] >= '0' && email_or_ph[i] <= '9' {
+	for i := 0; i < len(emailOrPhone); i++ {
+		if emailOrPhone[i] >= '0' && emailOrPhone[i] <= '9' {
 			continue
 		} else {
 			isPh = false
@@ -33,22 +34,25 @@ func IsPhone(email_or_ph string) bool {
 	return isPh
 }
 
+//GetCryptPassword creates bcrypt password hash
 func GetCryptPassword(password string) string {
 	pasBytes, e := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if e != nil {
-		 //TODO: Properly handle error
+		//TODO: Properly handle error
 		log.Fatal(e)
 	}
 	return string(pasBytes)
 }
 
-func CheckPasswordHashes(request_password, db_password string) (bool, error) {
-	if e:= bcrypt.CompareHashAndPassword([]byte(db_password),[]byte(request_password)) ; e != nil {
+//CheckPasswordHashes check if given password belongs to same bcrypt hash or not
+func CheckPasswordHashes(userGivenPassword, userDBPassword string) (bool, error) {
+	if e := bcrypt.CompareHashAndPassword([]byte(userDBPassword), []byte(userGivenPassword)); e != nil {
 		return false, e
 	}
 	return true, nil
 }
 
+//InitDB initializes handle for DBs
 func InitDB() (*sql.DB, error) {
-	return sql.Open(DB_TYPE, DB_USER+":"+DB_PASSWORD+"@/"+DB_DBNAME)
+	return sql.Open(DBType, DBUser+":"+DBPassword+"@/"+DBSchemaName)
 }

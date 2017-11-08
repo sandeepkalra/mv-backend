@@ -12,6 +12,7 @@ import (
 	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
+// LookupItem lookup for item, or list of items in a category
 func (im *ItemModule) LookupItem(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
 	request := ItemRequest{ItemRequested: Item{}, CookieString: ""}
 	out := utils.GetResponseObject()
@@ -98,7 +99,7 @@ func (im *ItemModule) LookupItem(res http.ResponseWriter, req *http.Request, p h
 	}
 
 	/* At this point, we have a narrowed list of items(ItemSlice) */
-	item_slice_to_return := make([]Item, 10)
+	itemSliceResp := make([]Item, 10)
 	for _, i := range items {
 		item := Item{
 			ID:                i.ID,
@@ -113,19 +114,19 @@ func (im *ItemModule) LookupItem(res http.ResponseWriter, req *http.Request, p h
 			RegionCity:        i.RegionCity.String,
 			RegionPin:         i.RegionPin.String,
 			AliasName:         i.AliasName.String,
-			ItemUrl:           i.Itemurl.String,
+			ItemURL:           i.Itemurl.String,
 			Owner:             i.OwnerName.String,
 			CreatedOn:         i.CreatedOn.Time,
 			ExpiredOn:         i.ExpiryOn.Time,
 			IsExpired:         i.HasExpired.Valid,
 		}
-		item_slice_to_return = append(item_slice_to_return, item)
+		itemSliceResp = append(itemSliceResp, item)
 	}
 
 	out.Code = 0
-	out.Msg = strconv.Itoa(len(item_slice_to_return)) + " items found."
+	out.Msg = strconv.Itoa(len(itemSliceResp)) + " items found."
 	out.Response = map[string]interface{}{
-		"items": item_slice_to_return,
+		"items": itemSliceResp,
 	}
 	return
 }

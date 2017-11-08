@@ -10,6 +10,7 @@ import (
 	null "gopkg.in/volatiletech/null.v6"
 )
 
+// AddRR adds Reviews and Rating
 func (rr *RRModule) AddRR(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
 	request := RR{}
 	out := utils.GetResponseObject()
@@ -19,8 +20,8 @@ func (rr *RRModule) AddRR(res http.ResponseWriter, req *http.Request, p httprout
 		return
 	}
 
-	if request.PersonId == 0 ||
-		request.ItemId == 0 ||
+	if request.PersonID == 0 ||
+		request.ItemID == 0 ||
 		len(request.Comments) == 0 ||
 		request.Rating > 10 ||
 		request.Rating < 10 ||
@@ -30,8 +31,8 @@ func (rr *RRModule) AddRR(res http.ResponseWriter, req *http.Request, p httprout
 	}
 
 	review := models.ReviewRatingRelationship{
-		FKPersonID:             request.PersonId,
-		FKItemID:               request.ItemId,
+		FKPersonID:             request.PersonID,
+		FKItemID:               request.ItemID,
 		MyRelationshipWithItem: null.StringFrom(request.Relationship),
 		Comments:               null.StringFrom(request.Comments),
 		Rating:                 null.IntFrom(request.Rating),
@@ -47,10 +48,10 @@ func (rr *RRModule) AddRR(res http.ResponseWriter, req *http.Request, p httprout
 	if request.IsResponse { /* Overwrite , we need this step because golang do not allow bool to be converted to int. */
 		review.IsResponse = null.Int8From(1)
 		/* if this review is a response to other review, then we have to update both */
-		orig_review, e := models.FindReviewRatingRelationship(rr.DataBase, request.ItemId)
-		if e == nil && orig_review != nil {
-			orig_review.HasResponse = null.Int8From(1)
-			orig_review.Update(rr.DataBase)
+		origReview, e := models.FindReviewRatingRelationship(rr.DataBase, request.ItemID)
+		if e == nil && origReview != nil {
+			origReview.HasResponse = null.Int8From(1)
+			origReview.Update(rr.DataBase)
 		}
 	}
 

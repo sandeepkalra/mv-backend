@@ -11,6 +11,7 @@ import (
 	"gopkg.in/volatiletech/null.v6"
 )
 
+// UpdateItem update the record on a specific item
 func (im *ItemModule) UpdateItem(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
 	request := ItemRequest{ItemRequested: Item{}, CookieString: ""}
 	out := utils.GetResponseObject()
@@ -58,7 +59,7 @@ func (im *ItemModule) UpdateItem(res http.ResponseWriter, req *http.Request, p h
 		RegionCity:        null.StringFrom(request.ItemRequested.RegionCity),
 		RegionPin:         null.StringFrom(request.ItemRequested.RegionPin),
 		AliasName:         null.StringFrom(request.ItemRequested.AliasName),
-		Itemurl:           null.StringFrom(request.ItemRequested.ItemUrl),
+		Itemurl:           null.StringFrom(request.ItemRequested.ItemURL),
 		OwnerName:         null.StringFrom(request.ItemRequested.Owner),
 		CreatedOn:         null.TimeFrom(request.ItemRequested.CreatedOn),
 		ExpiryOn:          null.TimeFrom(request.ItemRequested.ExpiredOn),

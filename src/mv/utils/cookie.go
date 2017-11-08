@@ -5,16 +5,18 @@ import (
 	"time"
 )
 
+// SetCookie sets server side user session cookie to http header using ResponseWriter.
 func SetCookie(w http.ResponseWriter, sessionID string) {
 	expiration := time.Now().Add(365 * 24 * time.Hour)
 	cookie := http.Cookie{Name: "SecretSessID", Value: sessionID, Expires: expiration}
 	http.SetCookie(w, &cookie)
 }
 
+// GetCookie gets cookie from the http request.
 func GetCookie(r *http.Request) (sessionID string, e error) {
-	if c, e := r.Cookie("SecretSessID"); e != nil {
+	c, e := r.Cookie("SecretSessID")
+	if e != nil {
 		return "", e
-	} else {
-		return c.Value, nil
 	}
+	return c.Value, nil
 }

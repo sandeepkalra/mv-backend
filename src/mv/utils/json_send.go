@@ -6,17 +6,20 @@ import (
 	"net/http"
 )
 
-type SRespJson struct {
+// SRespJSON is the protocol of backend
+type SRespJSON struct {
 	Code     int         `json:"code"`
 	Msg      string      `json:"message"`
 	Response interface{} `json:"response"`
 }
 
-func GetResponseObject() *SRespJson {
-	return &SRespJson{Code: -1, Msg: "Invalid Params", Response: "None"}
+// GetResponseObject constructs and sends a default obj
+func GetResponseObject() *SRespJSON {
+	return &SRespJSON{Code: -1, Msg: "Invalid Params", Response: "None"}
 }
 
-func (out *SRespJson) Send(res http.ResponseWriter) {
+// Send marshal and send response out using responseWriter
+func (out *SRespJSON) Send(res http.ResponseWriter) {
 	res.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	data, err := json.Marshal(*out)
 	if err != nil {

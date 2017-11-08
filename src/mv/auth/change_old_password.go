@@ -11,6 +11,7 @@ import (
 	"gopkg.in/volatiletech/null.v6"
 )
 
+// ChangeOldPassword change old password with new.
 func (am *AuthModule) ChangeOldPassword(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
 	request := ChangeOldPasswordReq{Email: "", OldPassword: "", NewPassword: ""}
 	out := utils.GetResponseObject()

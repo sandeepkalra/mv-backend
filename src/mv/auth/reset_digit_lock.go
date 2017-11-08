@@ -11,6 +11,7 @@ import (
 	"gopkg.in/volatiletech/null.v6"
 )
 
+//ResetDigitLock resets digit_lock using password.
 func (am *AuthModule) ResetDigitLock(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
 	request := ResetDigitLockReq{Email: "", Password: "", NewDigitLock: ""}
 	out := utils.GetResponseObject()

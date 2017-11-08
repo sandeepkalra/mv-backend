@@ -6,10 +6,11 @@ import (
 	"time"
 )
 
+// RR typical RR structure.
 type RR struct {
 	ID                         int64     `json:"id"`
-	PersonId                   int64     `json:"person_id"`
-	ItemId                     int64     `json:"item_id"`
+	PersonID                   int64     `json:"person_id"`
+	ItemID                     int64     `json:"item_id"`
 	PersonName                 string    `json:"reviewer_name"`
 	Relationship               string    `json:"relationship"`
 	RelationshipDurationInDays int       `json:"relationship_duration_in_days"`
@@ -23,6 +24,7 @@ type RR struct {
 	HideDetails                bool      `json:"hide_details"`
 }
 
+// RRModule module handler
 type RRModule struct {
 	DataBase *sql.DB
 	RedisDB  *utils.RedisDb

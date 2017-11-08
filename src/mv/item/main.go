@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+// InitServer start item-server
 func InitServer() (*ItemModule, error) {
 	db, err := sql.Open("mysql", "root:@/mvdb?parseTime=true")
 	if err != nil {
@@ -25,11 +26,13 @@ func InitServer() (*ItemModule, error) {
 	return &ItemModule{DataBase: db, RedisDB: redis}, nil
 }
 
+// ServerClose stops item server
 func (im *ItemModule) ServerClose() {
 	im.DataBase.Close()
 	im.RedisDB.R.Close()
 }
 
+// Middleware middleware to http router.
 func (im *ItemModule) Middleware(res http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	/* CORS */
 	res.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -44,6 +47,7 @@ func (im *ItemModule) Middleware(res http.ResponseWriter, req *http.Request, nex
 	return
 }
 
+//Handler http handler
 func (im *ItemModule) Handler() http.Handler {
 
 	n := negroni.Classic()
@@ -62,6 +66,7 @@ func (im *ItemModule) Handler() http.Handler {
 	return n
 }
 
+// main item-module
 func main() {
 	srv, e := InitServer()
 	if e != nil {
@@ -71,9 +76,9 @@ func main() {
 	defer srv.ServerClose()
 
 	/************* PREPARE TO LAUNCH *************/
-	listen_str := "0.0.0.0:9502"
-	fmt.Println("ITEM MICROSERVICES LISTENING AT AT ", listen_str)
+	listenStr := "0.0.0.0:9502"
+	fmt.Println("ITEM MICROSERVICES LISTENING AT AT ", listenStr)
 
 	/************* SET THE BALL ROLLING  *************/
-	http.ListenAndServe(listen_str, srv.Handler())
+	http.ListenAndServe(listenStr, srv.Handler())
 }

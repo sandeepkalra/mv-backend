@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Item item schema to code mapping
 type Item struct {
 	ID                         int64     `json:"id"`
 	Name                       string    `json:"name"`
@@ -23,16 +24,18 @@ type Item struct {
 	RegionState                string    `json:"region_state, omitempty"`
 	RegionCity                 string    `json:"region_city, omitempty"`
 	RegionPin                  string    `json:"region_pin, omitempty"`
-	ItemUrl                    string    `json:"item_url, omitempty"`
+	ItemURL                    string    `json:"item_url, omitempty"`
 	Relationship               string    `json:"relationship, omitempty"`
 	RelationshipDurationInDays int       `json:"relationship_duration_in_days, omitempty"`
 }
 
+//ItemRequest typical request of item details
 type ItemRequest struct {
 	ItemRequested Item   `json:"item"`
 	CookieString  string `json:"cookie"`
 }
 
+// GetListRequest get the list of manufacturer, categories , and many more
 type GetListRequest struct {
 	NeedManufacturerList bool   `json:"need_manufacturer_list"`
 	ManufacturerContains string `json:"manufacturer_name_contains"`
@@ -40,9 +43,10 @@ type GetListRequest struct {
 	NeedCategoryList     bool   `json:"need_category_list"`
 	CategoryNameContains string `json:"category_name_contains"`
 
-	CookieString  string `json:"cookie"`
+	CookieString string `json:"cookie"`
 }
 
+// ItemModule module struct
 type ItemModule struct {
 	DataBase *sql.DB
 	RedisDB  *utils.RedisDb

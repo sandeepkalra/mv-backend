@@ -12,6 +12,7 @@ import (
 	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
+// Login lets user login
 func (am *AuthModule) Login(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
 	request := LoginReq{Email: "", Password: ""}
 	out := utils.GetResponseObject()
@@ -49,21 +50,21 @@ func (am *AuthModule) Login(res http.ResponseWriter, req *http.Request, p httpro
 	out.Msg = "ok"
 	out.Code = 0
 
-	session_cookie := gocql.TimeUUID().String()
-	client_cookie := gocql.TimeUUID().String()
+	sessionCookie := gocql.TimeUUID().String()
+	clientCookie := gocql.TimeUUID().String()
 
 	out.Response = map[string]interface{}{
-		"client_cookie": client_cookie,
+		"client_cookie": clientCookie,
 	}
 
 	/* For future identifier of session */
 	am.RedisDB.TimedAdd("PersonName", request.Email, name)
-	am.RedisDB.TimedAdd("ClientCookie", client_cookie, session_cookie)
-	am.RedisDB.TimedAdd("SessionCookieToEmail", session_cookie, request.Email)
-	am.RedisDB.TimedAdd("SessionCookie", request.Email, session_cookie)
-	am.RedisDB.TimedAdd("PersonId", request.Email, strconv.FormatInt(person.ID, 10))
+	am.RedisDB.TimedAdd("ClientCookie", clientCookie, sessionCookie)
+	am.RedisDB.TimedAdd("SessionCookieToEmail", sessionCookie, request.Email)
+	am.RedisDB.TimedAdd("SessionCookie", request.Email, sessionCookie)
+	am.RedisDB.TimedAdd("PersonID", request.Email, strconv.FormatInt(person.ID, 10))
 
-	utils.SetCookie(res, client_cookie)
+	utils.SetCookie(res, clientCookie)
 
 	return
 }
