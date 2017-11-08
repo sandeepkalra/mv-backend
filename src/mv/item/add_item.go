@@ -101,47 +101,23 @@ func (im *ItemModule) AddItem(res http.ResponseWriter, req *http.Request, p http
 		_manufacturer.Insert(im.DataBase)
 	}
 
-	var _category0ID, _category1ID, _category2ID int64
-
-	/* Category, level-0 */
-	if _category, err := models.Categories(im.DataBase, qm.Where("name=? AND fk_parent_category_id=?", request.ItemRequested.Category, 0)).One(); err != nil {
-		/* fk_parent_category_id = 0 , i.e. no parent of this category */
-		_category.Name = null.StringFrom(request.ItemRequested.Category)
-		_category.FKParentCategoryID = null.Int64From(0)
-		_category.Insert(im.DataBase)
-		_category0ID = _category.ID
-	} else {
-		_category0ID = _category.ID
+	/* At this point, we want to insert the categories, in the sequence such that they remember their parent id */
+	categoryNames := []string{request.ItemRequested.Category,
+		request.ItemRequested.SubCategory,
+		request.ItemRequested.SubSubCategory,
+		request.ItemRequested.SubSubSubCategory,
 	}
-
-	/* Category, level - 1 */
-	if _category, err := models.Categories(im.DataBase, qm.Where("name=? AND fk_parent_category_id=?", request.ItemRequested.Category, _category0ID)).One(); err != nil {
-		/* fk_parent_category_id = 0 , i.e. no parent of this category */
-		_category.Name = null.StringFrom(request.ItemRequested.Category)
-		_category.FKParentCategoryID = null.Int64From(_category0ID)
-		_category.Insert(im.DataBase)
-		_category1ID = _category.ID
-	} else {
-		_category1ID = _category.ID
-	}
-
-	/* Category, level - 2 */
-	if _category, err := models.Categories(im.DataBase, qm.Where("name=? AND fk_parent_category_id=?", request.ItemRequested.Category, _category1ID)).One(); err != nil {
-		/* fk_parent_category_id = 0 , i.e. no parent of this category */
-		_category.Name = null.StringFrom(request.ItemRequested.Category)
-		_category.FKParentCategoryID = null.Int64From(_category1ID)
-		_category.Insert(im.DataBase)
-		_category2ID = _category.ID
-	} else {
-		_category2ID = _category.ID
-	}
-
-	/* Category, level - 3 */
-	if _category, err := models.Categories(im.DataBase, qm.Where("name=? AND fk_parent_category_id=?", request.ItemRequested.Category, _category2ID)).One(); err != nil {
-		/* fk_parent_category_id = 0 , i.e. no parent of this category */
-		_category.Name = null.StringFrom(request.ItemRequested.Category)
-		_category.FKParentCategoryID = null.Int64From(_category2ID)
-		_category.Insert(im.DataBase)
+	categoryIDAfterInsertion := int64(0)
+	for categoryName := range categoryNames {
+		if _category, err := models.Categories(im.DataBase, qm.Where("name=? AND fk_parent_category_id=?", categoryName, categoryIDAfterInsertion)).One(); err != nil {
+			/* Case when this name category exists */
+			_category.Name = null.StringFrom(request.ItemRequested.Category)
+			_category.FKParentCategoryID = null.Int64From(0)
+			_category.Insert(im.DataBase)
+			categoryIDAfterInsertion = _category.ID
+		} else { /* Case when this name category Does not exists */
+			categoryIDAfterInsertion = _category.ID
+		}
 	}
 
 	/* Done , Add success */
