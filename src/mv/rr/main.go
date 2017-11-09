@@ -3,8 +3,8 @@ package main
 import (
 	"database/sql"
 	"fmt"
-
 	"github.com/Codegangsta/negroni"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/julienschmidt/httprouter"
 
 	"mv/utils"
@@ -16,10 +16,12 @@ import (
 func InitServer() (*RRModule, error) {
 	db, err := sql.Open("mysql", "root:@/mvdb?parseTime=true")
 	if err != nil {
+		fmt.Println("failed to open SQL connection", err.Error())
 		return nil, err
 	}
 	b, redis := utils.FastMemInit("127.0.0.1")
 	if b != true {
+		fmt.Println("failed to start fastmem")
 		db.Close()
 		return nil, fmt.Errorf("failed to init redis")
 	}
@@ -67,6 +69,7 @@ func (rr *RRModule) Handler() http.Handler {
 func main() {
 	srv, e := InitServer()
 	if e != nil {
+		fmt.Println("failed to init server")
 		return
 	}
 

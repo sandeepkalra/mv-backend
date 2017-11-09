@@ -4,22 +4,25 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/Codegangsta/negroni"
-	"github.com/julienschmidt/httprouter"
-
 	"mv/utils"
 	"net/http"
 	"strings"
+
+	"github.com/Codegangsta/negroni"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/julienschmidt/httprouter"
 )
 
 // InitServer start item-server
 func InitServer() (*ItemModule, error) {
 	db, err := sql.Open("mysql", "root:@/mvdb?parseTime=true")
 	if err != nil {
+		fmt.Println("failed to connect db", err.Error())
 		return nil, err
 	}
 	b, redis := utils.FastMemInit("127.0.0.1")
 	if b != true {
+		fmt.Println("failed to start fastmem")
 		db.Close()
 		return nil, fmt.Errorf("failed to init redis")
 	}
