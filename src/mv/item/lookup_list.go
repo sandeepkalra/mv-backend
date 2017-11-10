@@ -2,12 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/julienschmidt/httprouter"
-	"github.com/volatiletech/sqlboiler/queries/qm"
 	"mv/models"
 	"mv/utils"
 	"net/http"
 	"strings"
+
+	"github.com/julienschmidt/httprouter"
+	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
 //LookupList returns list of manufacturer and categories, and many more things to come.
@@ -30,35 +31,62 @@ func (im *ItemModule) LookupList(res http.ResponseWriter, req *http.Request, p h
 
 	manufacturers := make([]string, 1)
 
+	if request.ManufacturerContains == "All" {
+		request.ManufacturerContains = ""
+	}
+
 	if request.NeedManufacturerList {
 		mList, e := models.ManufacturersLists(im.DataBase).All()
 		if e != nil {
 			for _, m := range mList {
+
 				if len(request.ManufacturerContains) > 0 {
 					if strings.ContainsAny(m.Name.String, request.ManufacturerContains) == true {
 						manufacturers = append(manufacturers, m.Name.String)
+
 					}
 				} else {
 					manufacturers = append(manufacturers, m.Name.String)
+
 				}
+
 			}
 		}
 		response["manufacturers"] = manufacturers
 	}
 
-	categories := make([]string, 1)
+	categories := make([]CategoryList, 1)
+
 	if request.NeedCategoryList {
-		/* We lookup only top level categories */
 		cList, e := models.Categories(im.DataBase, qm.Where("fk_parent_category_id = ?", 0)).All()
-		if e != nil {
+		if e == nil {
+			category := CategoryList{}
+			categoryID := int64(0)
 			for _, m := range cList {
-				if len(request.CategoryNameContains) > 0 {
+				if len(request.CategoryNameContains) > 0 { /* filter */
 					if strings.ContainsAny(m.Name.String, request.ManufacturerContains) == true {
-						categories = append(categories, m.Name.String)
+						category.CategoryName = m.Name.String
+						categoryID = m.ID
 					}
 				} else {
-					categories = append(categories, m.Name.String)
+					category.CategoryName = m.Name.String
+					categoryID = m.ID
 				}
+				if request.NeedSubCategoryList {
+					listSubCategories, err := models.Categories(im.DataBase, qm.Where("fk_parent_category_id=?", categoryID)).All()
+					if err == nil {
+						for _, m := range listSubCategories {
+							if len(request.CategoryNameContains) > 0 { /* filter */
+								if strings.ContainsAny(m.Name.String, request.CategoryNameContains) {
+									category.SubCategoryNames = append(category.SubCategoryNames, m.Name.String)
+								}
+							} else {
+								category.SubCategoryNames = append(category.SubCategoryNames, m.Name.String)
+							}
+						}
+					}
+				}
+				categories = append(categories, category)
 			}
 		}
 		response["categories"] = categories

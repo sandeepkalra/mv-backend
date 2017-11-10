@@ -41,9 +41,15 @@ type GetListRequest struct {
 	ManufacturerContains string `json:"manufacturer_name_contains"`
 
 	NeedCategoryList     bool   `json:"need_category_list"`
+	NeedSubCategoryList  bool   `json:"need_sub_category_list"`
 	CategoryNameContains string `json:"category_name_contains"`
+	CookieString         string `json:"cookie"`
+}
 
-	CookieString string `json:"cookie"`
+// CategoryList is used to send list of categories
+type CategoryList struct {
+	CategoryName     string   `json:"category_name"`
+	SubCategoryNames []string `json:"sub_categories"`
 }
 
 // ItemModule module struct
