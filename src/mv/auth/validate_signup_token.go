@@ -1,9 +1,9 @@
 package main
 
 import (
+	"../models"
+	"../utils"
 	"encoding/json"
-	"mv/models"
-	"mv/utils"
 	"net/http"
 
 	"fmt"

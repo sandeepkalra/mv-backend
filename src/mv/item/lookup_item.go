@@ -1,11 +1,11 @@
 package main
 
 import (
+	"../utils"
 	"encoding/json"
-	"mv/utils"
 	"net/http"
 
-	"mv/models"
+	"../models"
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"

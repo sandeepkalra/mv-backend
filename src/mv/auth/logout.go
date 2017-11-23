@@ -1,7 +1,7 @@
 package main
 
 import (
-	"mv/utils"
+	"../utils"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
