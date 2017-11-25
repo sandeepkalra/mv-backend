@@ -1,4 +1,9 @@
 bin/
+.idea/
+release/
+bin-release/
+debug/
+bin-debug/
 sourcegraph.com/
 github.com/
 golang.org/
