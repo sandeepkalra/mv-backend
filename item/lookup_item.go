@@ -74,8 +74,12 @@ func (im *ItemModule) LookupItem(res http.ResponseWriter, req *http.Request, p h
 				request.ItemRequested.Name,
 				request.ItemRequested.Manufacturer)).All()
 		if err != nil || len(items) == 0 {
-			out.Msg = err.Error()
-			out.Response = "no items found"
+			if err != nil {
+				out.Msg = err.Error()
+			} else {
+				out.Msg = "no items found"
+				out.Response = "no items found"
+			}
 			return
 		}
 
