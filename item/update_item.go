@@ -13,7 +13,7 @@ import (
 
 // UpdateItem update the record on a specific item
 func (im *ItemModule) UpdateItem(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
-	request := ItemRequest{ItemRequested: Item{}, CookieString: ""}
+	request := ItemRequest{ItemRequested: ItemObj{}, CookieString: ""}
 	out := utils.GetResponseObject()
 	defer out.Send(res)
 
@@ -61,8 +61,8 @@ func (im *ItemModule) UpdateItem(res http.ResponseWriter, req *http.Request, p h
 		AliasName:         null.StringFrom(request.ItemRequested.AliasName),
 		Itemurl:           null.StringFrom(request.ItemRequested.ItemURL),
 		OwnerName:         null.StringFrom(request.ItemRequested.Owner),
-		CreatedOn:         null.TimeFrom(request.ItemRequested.CreatedOn),
-		ExpiryOn:          null.TimeFrom(request.ItemRequested.ExpiredOn),
+		CreatedOn:         null.TimeFrom(*request.ItemRequested.CreatedOn),
+		ExpiryOn:          null.TimeFrom(*request.ItemRequested.ExpiredOn),
 	}
 
 	if request.ItemRequested.IsExpired {

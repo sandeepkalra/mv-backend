@@ -4,16 +4,18 @@ import (
 	"../models"
 	"../utils"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/volatiletech/sqlboiler/queries/qm"
 	"gopkg.in/volatiletech/null.v6"
+	"time"
 )
 
 // AddItem add item to database
 func (im *ItemModule) AddItem(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
-	request := ItemRequest{ItemRequested: Item{}, CookieString: ""}
+	request := ItemRequest{ItemRequested: ItemObj{}, CookieString: ""}
 	out := utils.GetResponseObject()
 	defer out.Send(res)
 
@@ -27,6 +29,10 @@ func (im *ItemModule) AddItem(res http.ResponseWriter, req *http.Request, p http
 		len(request.ItemRequested.Category) == 0 ||
 		len(request.ItemRequested.SubCategory) == 0 {
 		out.Msg = "name, manufacturer/creator and category/sub_category cannot be zero."
+		fmt.Println("request Item has ", request.ItemRequested.Name,
+			request.ItemRequested.Manufacturer,
+			request.ItemRequested.Category,
+			request.ItemRequested.SubCategory)
 		return
 	}
 
@@ -40,7 +46,7 @@ func (im *ItemModule) AddItem(res http.ResponseWriter, req *http.Request, p http
 	if e == nil && _item != nil {
 		out.Msg = "Item exist in our database"
 		out.Response = map[string]interface{}{
-			"item": Item{
+			"item": ItemObj{
 				ID:                _item.ID,
 				Name:              _item.Name.String,
 				Manufacturer:      _item.Manufacturer.String,
@@ -55,8 +61,8 @@ func (im *ItemModule) AddItem(res http.ResponseWriter, req *http.Request, p http
 				AliasName:         _item.AliasName.String,
 				ItemURL:           _item.Itemurl.String,
 				Owner:             _item.OwnerName.String,
-				CreatedOn:         _item.CreatedOn.Time,
-				ExpiredOn:         _item.ExpiryOn.Time,
+				CreatedOn:         &_item.CreatedOn.Time,
+				ExpiredOn:         &_item.ExpiryOn.Time,
 				IsExpired:         _item.HasExpired.Valid,
 			},
 		}
@@ -79,8 +85,18 @@ func (im *ItemModule) AddItem(res http.ResponseWriter, req *http.Request, p http
 		AliasName:         null.StringFrom(request.ItemRequested.AliasName),
 		Itemurl:           null.StringFrom(request.ItemRequested.ItemURL),
 		OwnerName:         null.StringFrom(request.ItemRequested.Owner),
-		CreatedOn:         null.TimeFrom(request.ItemRequested.CreatedOn),
-		ExpiryOn:          null.TimeFrom(request.ItemRequested.ExpiredOn),
+	}
+
+	if request.ItemRequested.CreatedOn != nil {
+		item.CreatedOn = null.TimeFrom(*request.ItemRequested.CreatedOn)
+	} else {
+		item.CreatedOn = null.TimeFrom(time.Now())
+	}
+
+	if request.ItemRequested.ExpiredOn != nil {
+		item.ExpiryOn = null.TimeFrom(*request.ItemRequested.ExpiredOn)
+	} else {
+		// do not do anything
 	}
 
 	if request.ItemRequested.IsExpired {
@@ -96,9 +112,10 @@ func (im *ItemModule) AddItem(res http.ResponseWriter, req *http.Request, p http
 
 	/* At this point, we lookup manufacturer_list, and categories, and if they need to have this, we add there too */
 
-	if _manufacturer, err := models.ManufacturersLists(im.DataBase, qm.Where("name=?", request.ItemRequested.Manufacturer)).One(); err != nil {
-		_manufacturer.Name = null.StringFrom(request.ItemRequested.Manufacturer)
-		_manufacturer.Insert(im.DataBase)
+	if _, err := models.ManufacturersLists(im.DataBase, qm.Where("name=?", request.ItemRequested.Manufacturer)).One(); err != nil {
+		_m := models.ManufacturersList{}
+		_m.Name = null.StringFrom(request.ItemRequested.Manufacturer)
+		_m.Insert(im.DataBase)
 	}
 
 	/* At this point, we want to insert the categories, in the sequence such that they remember their parent id */
@@ -107,16 +124,26 @@ func (im *ItemModule) AddItem(res http.ResponseWriter, req *http.Request, p http
 		request.ItemRequested.SubSubCategory,
 		request.ItemRequested.SubSubSubCategory,
 	}
+
 	categoryIDAfterInsertion := int64(0)
-	for categoryName := range categoryNames {
-		if _category, err := models.Categories(im.DataBase, qm.Where("name=? AND fk_parent_category_id=?", categoryName, categoryIDAfterInsertion)).One(); err != nil {
-			/* Case when this name category exists */
-			_category.Name = null.StringFrom(request.ItemRequested.Category)
-			_category.FKParentCategoryID = null.Int64From(0)
-			_category.Insert(im.DataBase)
-			categoryIDAfterInsertion = _category.ID
-		} else { /* Case when this name category Does not exists */
-			categoryIDAfterInsertion = _category.ID
+
+	for _, categoryName := range categoryNames {
+		if categoryName != "" {
+			fmt.Println("category", categoryName)
+			if _category, err := models.Categories(im.DataBase, qm.Where("name=?", categoryName)).One(); err != nil {
+				fmt.Println("1", _category, err)
+				/* Case when this name category exists */
+				_c := models.Category{}
+				_c.Name = null.StringFrom(categoryName)
+				_c.FKParentCategoryID = null.Int64From(categoryIDAfterInsertion)
+				if er := _c.Insert(im.DataBase); er != nil {
+					fmt.Println("1.1", _c, er)
+				}
+				categoryIDAfterInsertion = _c.ID
+			} else { /* Case when this name category Does not exists */
+				fmt.Println("2", _category, err)
+				categoryIDAfterInsertion = _category.ID
+			}
 		}
 	}
 

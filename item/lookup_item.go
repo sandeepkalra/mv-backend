@@ -8,13 +8,14 @@ import (
 	"../models"
 	"strconv"
 
+	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"github.com/volatiletech/sqlboiler/queries/qm"
 )
 
 // LookupItem lookup for item, or list of items in a category
 func (im *ItemModule) LookupItem(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
-	request := ItemRequest{ItemRequested: Item{}, CookieString: ""}
+	request := ItemRequest{ItemRequested: ItemObj{}, CookieString: ""}
 	out := utils.GetResponseObject()
 	defer out.Send(res)
 
@@ -24,25 +25,30 @@ func (im *ItemModule) LookupItem(res http.ResponseWriter, req *http.Request, p h
 	}
 
 	/* I choose to do this:
-		An Item can be narrowed based on this :
+		An ItemObj can be narrowed based on this :
 		(a) Name			iPhone
 	 	(b) Manufacturer	Apple
 		(c) Category		Electronics
 		(d) SubCategory 	Phone
 		For Simplistic search, I need (a)+(b), (a)+(c)+(d) , (b)+(c)+(d), or all.
 	*/
+
 	a := (len(request.ItemRequested.Name) != 0)
 	b := (len(request.ItemRequested.Manufacturer) != 0)
 	c := (len(request.ItemRequested.Category) != 0)
 	d := (len(request.ItemRequested.SubCategory) != 0)
 
 	case1 := a && b
+	fmt.Println("case1", case1)
 	case2 := a && c && d
+	fmt.Println("case2", case2)
 	case3 := b && c && d
+	fmt.Println("case3", case3)
 	case4 := a && b && c && d
+	fmt.Println("case4", case4)
 
 	if !(case1 || case2 || case3) {
-		out.Msg = "Not enough info to locate the Item(s). "
+		out.Msg = "Not enough info to locate the ItemObj(s). "
 		return
 	}
 
@@ -99,9 +105,10 @@ func (im *ItemModule) LookupItem(res http.ResponseWriter, req *http.Request, p h
 	}
 
 	/* At this point, we have a narrowed list of items(ItemSlice) */
-	itemSliceResp := make([]Item, 10)
+	itemSliceResp := make([]ItemObj, 10)
 	for _, i := range items {
-		item := Item{
+
+		item := ItemObj{
 			ID:                i.ID,
 			Name:              i.Name.String,
 			Manufacturer:      i.Manufacturer.String,
@@ -116,10 +123,11 @@ func (im *ItemModule) LookupItem(res http.ResponseWriter, req *http.Request, p h
 			AliasName:         i.AliasName.String,
 			ItemURL:           i.Itemurl.String,
 			Owner:             i.OwnerName.String,
-			CreatedOn:         i.CreatedOn.Time,
-			ExpiredOn:         i.ExpiryOn.Time,
+			CreatedOn:         &i.CreatedOn.Time,
+			ExpiredOn:         &i.ExpiryOn.Time,
 			IsExpired:         i.HasExpired.Valid,
 		}
+
 		itemSliceResp = append(itemSliceResp, item)
 	}
 
