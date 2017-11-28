@@ -14,7 +14,7 @@ import (
 
 //LookupList returns list of manufacturer and categories, and many more things to come.
 func (im *ItemModule) LookupList(res http.ResponseWriter, req *http.Request, p httprouter.Params) {
-	request := GetListRequest{CookieString: ""}
+	request := GetListRequest{}
 	out := utils.GetResponseObject()
 	defer out.Send(res)
 
@@ -30,7 +30,7 @@ func (im *ItemModule) LookupList(res http.ResponseWriter, req *http.Request, p h
 	}
 	response := make(map[string]interface{})
 
-	manufacturers := make([]string, 1)
+	manufacturers := make([]string, 0, 10)
 
 	if request.ManufacturerContains == "All" {
 		request.ManufacturerContains = ""
@@ -57,7 +57,7 @@ func (im *ItemModule) LookupList(res http.ResponseWriter, req *http.Request, p h
 		response["manufacturers"] = manufacturers
 	}
 
-	categories := make([]CategoryList, 1)
+	categories := make([]CategoryList, 0, 10)
 
 	if request.NeedCategoryList {
 		cList, e := models.Categories(im.DataBase, qm.Where("fk_parent_category_id = ?", 0)).All()

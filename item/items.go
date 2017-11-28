@@ -32,7 +32,7 @@ type ItemObj struct {
 //ItemRequest typical request of item details
 type ItemRequest struct {
 	ItemRequested ItemObj `json:"item"`
-	CookieString  string  `json:"cookie"`
+	CookieString  string  `json:"cookie, omitempty"`
 }
 
 // GetListRequest get the list of manufacturer, categories , and many more
@@ -43,7 +43,7 @@ type GetListRequest struct {
 	NeedCategoryList     bool   `json:"need_category_list"`
 	NeedSubCategoryList  bool   `json:"need_sub_category_list"`
 	CategoryNameContains string `json:"category_name_contains"`
-	CookieString         string `json:"cookie"`
+	CookieString         string `json:"cookie,omitempty"`
 }
 
 // CategoryList is used to send list of categories

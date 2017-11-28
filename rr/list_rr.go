@@ -32,7 +32,7 @@ func (rr *RRModule) ListRR(res http.ResponseWriter, req *http.Request, p httprou
 		return
 	}
 
-	responses := make([]RR, 10)
+	responses := make([]RR, 0, 10)
 
 	cnt := 0
 	for _, r := range reviews {

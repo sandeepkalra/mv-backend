@@ -62,9 +62,15 @@ func (im *ItemModule) LookupItem(res http.ResponseWriter, req *http.Request, p h
 				request.ItemRequested.Manufacturer,
 				request.ItemRequested.Category,
 				request.ItemRequested.SubCategory)).All()
+		fmt.Println("case4, len=", len(items))
 		if err != nil || len(items) == 0 {
-			out.Msg = err.Error()
-			out.Response = "no items found"
+			if err != nil {
+				out.Msg = err.Error()
+			} else {
+				out.Msg = "no items found"
+				out.Response = 0
+				out.Code = 0
+			}
 			return
 		}
 
@@ -73,12 +79,14 @@ func (im *ItemModule) LookupItem(res http.ResponseWriter, req *http.Request, p h
 			qm.Where("name = ? AND manufacturer = ? ",
 				request.ItemRequested.Name,
 				request.ItemRequested.Manufacturer)).All()
+		fmt.Println("case1, len=", len(items))
 		if err != nil || len(items) == 0 {
 			if err != nil {
 				out.Msg = err.Error()
 			} else {
 				out.Msg = "no items found"
-				out.Response = "no items found"
+				out.Response = 0
+				out.Code = 0
 			}
 			return
 		}
@@ -89,9 +97,15 @@ func (im *ItemModule) LookupItem(res http.ResponseWriter, req *http.Request, p h
 				request.ItemRequested.Name,
 				request.ItemRequested.Category,
 				request.ItemRequested.SubCategory)).All()
+		fmt.Println("case2, len=", len(items))
 		if err != nil || len(items) == 0 {
-			out.Msg = err.Error()
-			out.Response = "no items found"
+			if err != nil {
+				out.Msg = err.Error()
+			} else {
+				out.Msg = "no items found"
+				out.Response = 0
+				out.Code = 0
+			}
 			return
 		}
 
@@ -101,15 +115,22 @@ func (im *ItemModule) LookupItem(res http.ResponseWriter, req *http.Request, p h
 				request.ItemRequested.Manufacturer,
 				request.ItemRequested.Category,
 				request.ItemRequested.SubCategory)).All()
+
+		fmt.Println("case3, len=", len(items))
 		if err != nil || len(items) == 0 {
-			out.Msg = err.Error()
-			out.Response = "no items found"
+			if err != nil {
+				out.Msg = err.Error()
+			} else {
+				out.Msg = "no items found"
+				out.Response = 0
+				out.Code = 0
+			}
 			return
 		}
 	}
 
 	/* At this point, we have a narrowed list of items(ItemSlice) */
-	itemSliceResp := make([]ItemObj, 10)
+	itemSliceResp := make([]ItemObj, 0, 10)
 	for _, i := range items {
 
 		item := ItemObj{
