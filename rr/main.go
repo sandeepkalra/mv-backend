@@ -34,7 +34,7 @@ func (rr *RRModule) ServerClose() {
 	rr.RedisDB.R.Close()
 }
 
-// Middleware middle-ware to http router.
+// Middleware middle-ware to HTTP router.
 func (rr *RRModule) Middleware(res http.ResponseWriter, req *http.Request, next http.HandlerFunc) {
 	/* CORS */
 	res.Header().Set("Content-Type", "text/html; charset=utf-8")

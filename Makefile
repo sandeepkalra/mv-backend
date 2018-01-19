@@ -9,7 +9,7 @@ INST=go install
 DEBUG_FLAGS=-gcflags "-N -l"
 RELEASE_FLAGS=-ldflags "-w"
 WORKSPACE_PATH=.
-
+MODULES= auth rr item
 .PHONY : all 
 all: release
 release: setup format lint build_release release-install 
@@ -21,46 +21,46 @@ setup:
 	mkdir -p bin
 
 lint:
-	$(LINT) ${WORKSPACE_PATH}/auth
-	$(LINT) ${WORKSPACE_PATH}/rr
-	$(LINT) ${WORKSPACE_PATH}/item
+	for mod in $(MODULES); do \
+		$(LINT) ${WORKSPACE_PATH}/$$mod; \
+	done
 
 go_install:
-	$(INST) ${WORKSPACE_PATH}/auth
-	$(INST) ${WORKSPACE_PATH}/rr
-	$(INST) ${WORKSPACE_PATH}/item
+	for mod in $(MODULES); do \
+		$(INST) ${WORKSPACE_PATH}/$$mod;\
+	done
 
-fix: 
-	$(FIX) ${WORKSPACE_PATH}/auth
-	$(FIX) ${WORKSPACE_PATH}/rr
-	$(FIX) ${WORKSPACE_PATH}/item
+fix:
+	for mod in $(MODULES); do \
+		$(FIX) ${WORKSPACE_PATH}/$$mod;\
+	done
 
 vet: 
-	$(VET) ${WORKSPACE_PATH}/auth
-	$(VET) ${WORKSPACE_PATH}/rr
-	$(VET) ${WORKSPACE_PATH}/item
+	for mod in $(MODULES); do \
+		$(VET) ${WORKSPACE_PATH}/$$mod;\
+	done
 
 format: 
-	$(FMT) ${WORKSPACE_PATH}/auth
-	$(FMT) ${WORKSPACE_PATH}/rr
-	$(FMT) ${WORKSPACE_PATH}/item
+	for mod in $(MODULES); do \
+		$(FMT) ${WORKSPACE_PATH}/$$mod;\
+	done
 
 ################ RELEASE VERSION #####################
 build_release: 
 	@echo "=== building release ==="
 	mkdir -p bin 
-	$(BUILD) $(RELEASE_FLAGS) -o bin/auth.bin ${WORKSPACE_PATH}/auth
-	$(BUILD) $(RELEASE_FLAGS) -o bin/rr.bin ${WORKSPACE_PATH}/rr
-	$(BUILD) $(RELEASE_FLAGS) -o bin/item.bin ${WORKSPACE_PATH}/item
+	for mod in $(MODULES); do \
+			$(BUILD) $(RELEASE_FLAGS) -o bin/$$mod.bin  ${WORKSPACE_PATH}/$$mod;\
+	done
 
 ################ DEBUG VERSION #####################
 
 build_debug: 
 	@echo "=== building debug ==="
 	mkdir -p bin 
-	$(BUILD) $(DEBUG_FLAGS) -o bin/auth.bin ${WORKSPACE_PATH}/auth
-	$(BUILD) $(DEBUG_FLAGS) -o bin/rr.bin ${WORKSPACE_PATH}/rr
-	$(BUILD) $(DEBUG_FLAGS) -o bin/item.bin ${WORKSPACE_PATH}/item
+	for mod in $(MODULES); do \
+			$(BUILD) $(DEBUG_FLAGS) -o bin/$$mod.bin  ${WORKSPACE_PATH}/$$mod;\
+	done
 
 post_install:
 
